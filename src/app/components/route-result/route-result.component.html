@@ -1,0 +1,55 @@
+<div class="result-container">
+  <div class="route-details">
+    <div *ngFor="let stage of routeData.stages; let i = index" class="stage-card">
+      <h3>Этап {{i + 1}}: {{stage.title}}</h3>
+
+      <div *ngIf="stage.time" class="time">
+        ⌚ {{stage.time}}
+      </div>
+
+      <div *ngIf="stage.description" class="route-section">
+        <h4>🗺️ Маршрут:</h4>
+        <ul>
+          <li>{{stage.description}}</li>
+        </ul>
+      </div>
+
+      <div *ngIf="stage.activities.length" class="attractions-section">
+        <h4>👀 Достопримечательности:</h4>
+        <div *ngFor="let activity of stage.activities" class="attraction-item">
+          {{activity}}
+        </div>
+      </div>
+
+      <div *ngIf="stage.activities.length" class="food-section">
+        <h4>🍴 Где поесть:</h4>
+        <div *ngFor="let activity of stage.activities" class="food-item">
+          {{activity}}
+        </div>
+      </div>
+
+      <div *ngIf="stage.tips.length" class="tips-section">
+        <h4>📌 Советы:</h4>
+        <ul>
+          <li *ngFor="let tip of stage.tips">{{tip}}</li>
+        </ul>
+      </div>
+
+      <div class="stage-map-actions">
+        <button class="yandex-maps-btn small" (click)="openInYandexMaps(i)">
+          <img src="assets/icons/yandex-maps.svg" alt="Yandex Maps Icon">
+          Показать на карте
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="map" class="map"></div>
+
+  <div class="map-actions">
+    <button class="yandex-maps-btn" (click)="openInYandexMaps()">
+      <img src="assets/icons/yandex-maps.svg" alt="Yandex Maps Icon">
+      Открыть весь маршрут в Яндекс.Картах
+    </button>
+  </div>
+</div>

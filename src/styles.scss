@@ -1,0 +1,97 @@
+/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  // Modern Color Scheme
+  --primary: #6366f1;
+  --primary-dark: #4f46e5;
+  --secondary: #ec4899;
+  --accent: #8b5cf6;
+
+  // Gradients
+  --gradient-primary: linear-gradient(135deg, #6366f1, #ec4899);
+  --gradient-secondary: linear-gradient(135deg, #8b5cf6, #d946ef);
+  --gradient-accent: linear-gradient(135deg, #14b8a6, #0ea5e9);
+
+  // Neutral Colors
+  --background: #0f172a;
+  --surface: #1e293b;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+
+  // Glass Effect
+  --glass-background: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.05);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
+
+  // Shadows
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+  // Border Radius
+  --radius-sm: 0.5rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.5rem;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--background);
+  color: var(--text-primary);
+  min-height: 100vh;
+  line-height: 1.6;
+  background: radial-gradient(circle at top right, #2d1b69, #1a103f);
+}
+
+// Modern Scrollbar
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 4px;
+}
+
+// Utility Classes
+.glass-effect {
+  background: var(--glass-background);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.gradient-text {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+// Animations
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

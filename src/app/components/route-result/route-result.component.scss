@@ -1,0 +1,153 @@
+.result-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  animation: fadeIn 0.6s ease-out;
+}
+
+.stage-card {
+  background: var(--glass-background);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--glass-border);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--gradient-primary);
+  }
+
+  &:hover {
+    transform: translateX(5px);
+    box-shadow: var(--glass-shadow);
+  }
+
+  h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+  }
+
+  .time {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: var(--glass-background);
+    border-radius: var(--radius-sm);
+    margin-bottom: 1rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+  }
+}
+
+.section {
+  margin-top: 1.5rem;
+
+  h4 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+  }
+
+  ul {
+    list-style: none;
+
+    li {
+      position: relative;
+      padding-left: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary);
+
+      &::before {
+        content: '•';
+        position: absolute;
+        left: 0;
+        color: var(--primary);
+      }
+    }
+  }
+}
+
+.map-container {
+  height: 400px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin: 2rem 0;
+  border: 1px solid var(--glass-border);
+}
+
+.map-actions {
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.yandex-maps-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  background: #FC3F1D; // Яндекс красный
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 0 auto;
+
+  img {
+    width: 24px;
+    height: 24px;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(252, 63, 29, 0.3);
+  }
+}
+
+// Анимации для секций
+.section-block {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: slideIn 0.6s ease-out forwards;
+
+  @for $i from 1 through 10 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{$i * 0.1}s;
+    }
+  }
+}
+
+@keyframes slideIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stage-map-actions {
+  margin-top: 1rem;
+  text-align: right;
+
+  .yandex-maps-btn.small {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+
+    img {
+      width: 18px;
+      height: 18px;
+    }
+  }
+}

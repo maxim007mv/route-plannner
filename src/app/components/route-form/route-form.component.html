@@ -1,0 +1,175 @@
+<div class="form-container">
+  <button class="back-button" (click)="goBack()">← Назад</button>
+
+  <h2 class="form-title">{{getStepTitle()}}</h2>
+
+  <form [formGroup]="routeForm" (ngSubmit)="onSubmit()" *ngIf="!generatedRoute">
+    <!-- Step 1: Companions -->
+    <div *ngIf="currentStep === 1" class="form-step">
+      <div class="companion-buttons">
+        <button
+          type="button"
+          *ngFor="let companion of companions"
+          [class.selected]="routeForm.get('withWhom')?.value === companion.value"
+          (click)="selectCompanion(companion.value)"
+          class="companion-btn">
+          <span class="icon">{{companion.icon}}</span>
+          <span>{{companion.value}}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 2: Time and Duration -->
+    <div *ngIf="currentStep === 2" class="form-step">
+      <div class="form-group">
+        <label>Время начала</label>
+        <input
+          type="time"
+          formControlName="startTime"
+          [class.invalid]="isFieldInvalid('startTime')">
+      </div>
+
+      <div class="form-group">
+        <label>Длительность прогулки</label>
+        <select
+          formControlName="duration"
+          [class.invalid]="isFieldInvalid('duration')">
+          <option value="2">2 часа</option>
+          <option value="3">3 часа</option>
+          <option value="4">4 часа</option>
+          <option value="5">5 часов</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Step 3: Interests -->
+    <div *ngIf="currentStep === 3" class="form-step">
+      <div class="interests-grid">
+        <button
+          type="button"
+          *ngFor="let interest of interests"
+          [class.selected]="routeForm.get('interests')?.value?.includes(interest.value)"
+          (click)="toggleInterest(interest.value)"
+          class="interest-btn">
+          <span class="icon">{{interest.icon}}</span>
+          <span>{{interest.label}}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 4: Preferences -->
+    <div *ngIf="currentStep === 4" class="form-step">
+      <div class="form-group">
+        <label>Бюджет на кафе</label>
+        <select
+          formControlName="cafeBudget"
+          [class.invalid]="isFieldInvalid('cafeBudget')">
+          <option value="budget">Экономный (до 1000₽)</option>
+          <option value="medium">Средний (1000-2000₽)</option>
+          <option value="premium">Премиум (2000₽+)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Предпочитаемый способ передвижения</label>
+        <select
+          formControlName="transportPreference"
+          [class.invalid]="isFieldInvalid('transportPreference')">
+          <option value="walking">Пешком</option>
+          <option value="mixed">Смешанный (пешком + транспорт)</option>
+          <option value="transport">Преимущественно на транспорте</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Step 5: Additional Preferences -->
+    <div *ngIf="currentStep === 5" class="form-step">
+      <div class="form-group">
+        <label>Темп прогулки</label>
+        <select
+          formControlName="pace"
+          [class.invalid]="isFieldInvalid('pace')">
+          <option value="relaxed">Расслабленный</option>
+          <option value="moderate">Умеренный</option>
+          <option value="active">Активный</option>
+        </select>
+      </div>
+
+      <div class="checkbox-group">
+        <label>
+          <input type="checkbox" formControlName="accessibility">
+          Нужен маршрут с доступной средой
+        </label>
+      </div>
+
+      <div class="checkbox-group">
+        <label>
+          <input type="checkbox" formControlName="avoidCrowds">
+          Избегать людных мест
+        </label>
+      </div>
+    </div>
+
+    <!-- Step 6: Additional Wishes -->
+    <div *ngIf="currentStep === 6" class="form-step">
+      <div class="form-group">
+        <label>Дополнительные пожелания к маршруту</label>
+        <textarea
+          formControlName="additionalWishes"
+          [class.invalid]="isFieldInvalid('additionalWishes')"
+          placeholder="Расскажите подробнее о ваших предпочтениях, что хотели бы увидеть или посетить...">
+        </textarea>
+      </div>
+    </div>
+
+    <!-- Navigation buttons -->
+    <div class="form-navigation">
+      <button
+        type="button"
+        class="nav-button back"
+        *ngIf="currentStep > 1"
+        (click)="previousStep()">
+        Назад
+      </button>
+
+      <button
+        type="button"
+        class="nav-button next"
+        *ngIf="currentStep < totalSteps"
+        [disabled]="!isCurrentStepValid()"
+        (click)="nextStep()">
+        Далее
+      </button>
+
+      <button
+        type="submit"
+        class="nav-button next"
+        *ngIf="currentStep === totalSteps"
+        [disabled]="routeForm.invalid || isLoading">
+        <span *ngIf="!isLoading">🪄 Создать маршрут</span>
+        <span *ngIf="isLoading" class="loading-text">
+          <span class="loader"></span>
+          Создаем маршрут...
+        </span>
+      </button>
+    </div>
+  </form>
+
+  <div *ngIf="error" class="error-message">
+    ⚠️ {{error}}
+  </div>
+
+  <!-- Route Result -->
+  <div *ngIf="generatedRoute" class="route-result">
+    <h3>Ваш маршрут готов!</h3>
+    <div *ngFor="let stage of generatedRoute.stages" class="route-stage">
+      <h4>{{stage.title}}</h4>
+      <p>{{stage.description}}</p>
+      <div class="time">⏰ {{stage.time}}</div>
+      <ul>
+        <li *ngFor="let activity of stage.activities">{{activity}}</li>
+      </ul>
+    </div>
+    <button class="new-route-button" (click)="resetForm()">Создать новый маршрут</button>
+  </div>
+</div>

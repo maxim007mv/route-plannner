@@ -1,0 +1,248 @@
+@use "sass:math";
+
+// Container styles
+.container {
+  position: relative;
+  min-height: 100vh;
+  padding: 2rem;
+  overflow-x: hidden;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  // Gradient orbs
+  &::before,
+  &::after {
+    content: '';
+    position: fixed;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    filter: blur(100px);
+    z-index: -1;
+  }
+
+  &::before {
+    top: -100px;
+    right: -100px;
+    background: var(--primary);
+    opacity: 0.2;
+    animation: float 10s ease-in-out infinite;
+  }
+
+  &::after {
+    bottom: -100px;
+    left: -100px;
+    background: var(--secondary);
+    opacity: 0.2;
+    animation: float 8s ease-in-out infinite reverse;
+  }
+}
+
+// Floating background elements
+.floating-elements {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;
+  overflow: hidden;
+
+  .element {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: var(--primary);
+    border-radius: 50%;
+    opacity: 0.1;
+    animation: float 6s infinite;
+
+    @for $i from 1 through 20 {
+      &:nth-child(#{$i}) {
+        $random-left: math.div(math.random() * 1000, 10);
+        $random-top: math.div(math.random() * 1000, 10);
+        $random-scale: math.div(math.random() * 30, 10);
+        $random-duration: 3 + math.div(math.random() * 40, 10);
+
+        left: #{$random-left}#{"%"};
+        top: #{$random-top}#{"%"};
+        transform: scale(#{$random-scale});
+        animation: float #{$random-duration}s infinite;
+        animation-delay: -#{math.div($i, 2)}s;
+      }
+    }
+  }
+}
+
+// Header styles
+.header {
+  text-align: center;
+  margin-bottom: 3rem;
+  position: relative;
+  z-index: 1;
+
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}
+
+// Main content wrapper
+.content-wrapper {
+  position: relative;
+  z-index: 2;
+  backdrop-filter: blur(20px);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-background);
+  padding: 2rem;
+  margin-bottom: 2rem;
+}
+
+// Responsive styles
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .header {
+    h1 {
+      font-size: 2rem;
+    }
+
+    p {
+      font-size: 1rem;
+    }
+  }
+
+  .content-wrapper {
+    padding: 1.5rem;
+  }
+}
+
+// Animations
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(5deg);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.2;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Glass card effect
+.glass-card {
+  background: var(--glass-background);
+  backdrop-filter: blur(10px);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--glass-border);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--glass-shadow);
+  }
+}
+
+// Theme toggle button
+.theme-toggle {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  background: var(--glass-background);
+  border: 1px solid var(--glass-border);
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 1000;
+
+  &:hover {
+    transform: rotate(45deg);
+    background: var(--primary);
+
+    svg {
+      color: white;
+    }
+  }
+
+  svg {
+    width: 24px;
+    height: 24px;
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+  }
+}
+
+// Loading state
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+
+  .loader {
+    width: 48px;
+    height: 48px;
+    border: 4px solid var(--primary);
+    border-bottom-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
