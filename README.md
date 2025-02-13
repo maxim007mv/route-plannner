@@ -11,16 +11,18 @@
 ## 📱 Скриншоты
 
 <div align="center">
-  <img src="docs/images/logo.png" alt="Route Planner Logo" width="200"/>
+  <img src="https://i.imgur.com/ваш_код_картинки.png" alt="Route Planner Logo" width="200"/>
   
   # 🗺️ Route Planner Moscow
-  ...
+  
+  [![Angular](https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white)](https://angular.io/)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 </div>
 
 <div align="center">
-  <img src="docs/images/home-screenshot.png" alt="Home Page" width="400"/>
-  <img src="docs/images/form-screenshot.png" alt="Route Form" width="400"/>
-  <img src="docs/images/result-screenshot.png" alt="Route Result" width="400"/>
+  <img src="https://i.ibb.co/y7DwYnS/home-screenshot.png" alt="Home Page" width="400"/>
+  <img src="https://i.ibb.co/JRMf8VsJ/form-screenshot.png"  alt="Route Form" width="400"/>
+  <img src="https://i.ibb.co/6ctxzD40/result-screenshot.png"  alt="Route Result" width="400"/>
 </div>
 
 ## 🌟 Особенности
