@@ -1,4 +1,3 @@
-
 ## 🛠️ Технологии
 
 - **Frontend**: Angular 17, TypeScript
@@ -12,9 +11,16 @@
 ## 📱 Скриншоты
 
 <div align="center">
-  <img src="screenshots/home.png" alt="Home Page" width="400"/>
-  <img src="screenshots/form.png" alt="Route Form" width="400"/>
-  <img src="screenshots/result.png" alt="Route Result" width="400"/>
+  <img src="docs/images/logo.png" alt="Route Planner Logo" width="200"/>
+  
+  # 🗺️ Route Planner Moscow
+  ...
+</div>
+
+<div align="center">
+  <img src="docs/images/home-screenshot.png" alt="Home Page" width="400"/>
+  <img src="docs/images/form-screenshot.png" alt="Route Form" width="400"/>
+  <img src="docs/images/result-screenshot.png" alt="Route Result" width="400"/>
 </div>
 
 ## 🌟 Особенности
@@ -47,7 +53,7 @@
 
 ## 📄 Лицензия
 
-Этот проект распространяется под лицензией MIT. Подробности в файле [LICENSE](LICENSE).
+Этот проект распространяется под собственной лицензией. Подробности в файле [LICENSE](LICENSE.md).ы
 
 ## 👥 Команда
 
