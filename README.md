@@ -11,7 +11,7 @@
 ## 📱 Скриншоты
 
 <div align="center">
-  <img src="https://i.imgur.com/ваш_код_картинки.png" alt="Route Planner Logo" width="200"/>
+  <img src="https://i.ibb.co/TB374FbC/1605b46e-fb09-4344-84a0-873a072734f4.png" alt="Route Planner Logo" width="200"/>
   
   # 🗺️ Route Planner Moscow
   
