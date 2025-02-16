@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { RouteService } from '../../services/route.service';
 import { RouteData } from '../../models/route-data';
 
@@ -13,12 +14,12 @@ import { RouteData } from '../../models/route-data';
   styleUrls: ['./route-form.component.scss']
 })
 export class RouteFormComponent {
-  routeForm!: FormGroup;
+  routeForm: FormGroup;
+  currentStep = 1;
+  totalSteps = 6;
   isLoading = false;
   error: string | null = null;
   generatedRoute: RouteData | null = null;
-  currentStep = 1;
-  totalSteps = 6;
 
   companions = [
     { value: 'Один', icon: '👤' },
@@ -39,23 +40,20 @@ export class RouteFormComponent {
   constructor(
     private fb: FormBuilder,
     private router: Router,
+    private http: HttpClient,
     private routeService: RouteService
   ) {
-    this.initForm();
-  }
-
-  private initForm() {
     this.routeForm = this.fb.group({
       withWhom: ['', Validators.required],
-      startTime: ['18:00', Validators.required],
-      duration: ['3', Validators.required],
-      interests: [[], [Validators.required, Validators.minLength(1)]],
-      cafeBudget: ['budget', Validators.required],
-      transportPreference: ['walking', Validators.required],
-      additionalWishes: ['', [Validators.required, Validators.minLength(20)]],
-      pace: ['moderate', Validators.required],
+      startTime: ['', Validators.required],
+      duration: ['', Validators.required],
+      interests: [[], Validators.required],
+      cafeBudget: ['', Validators.required],
+      transportPreference: ['', Validators.required],
+      pace: ['', Validators.required],
       accessibility: [false],
-      avoidCrowds: [false]
+      avoidCrowds: [false],
+      additionalWishes: ['']
     });
   }
 
@@ -113,13 +111,23 @@ export class RouteFormComponent {
 
     this.isLoading = true;
     this.error = null;
+    this.generatedRoute = null;
 
     try {
-      const formData = this.routeForm.value;
-      this.generatedRoute = await this.routeService.generateRoute(formData);
+      console.log('Отправка формы:', this.routeForm.value);
+      const result = await this.routeService.generateRoute(this.routeForm.value);
+      console.log('Получен результат:', result);
+
+      if (!result || !result.stages || result.stages.length === 0) {
+        throw new Error('Получен пустой маршрут');
+      }
+
+      this.generatedRoute = result;
+      this.routeService.setCurrentRoute(result);
+      await this.router.navigate(['/route-result']);
     } catch (error: any) {
-      console.error('Error generating route:', error);
-      this.error = error.message || 'Произошла ошибка при генерации маршрута. Пожалуйста, попробуйте позже.';
+      console.error('Ошибка генерации маршрута:', error);
+      this.error = error.message || 'Произошла ошибка при генерации маршрута';
 
       if (error.message.includes('временно')) {
         setTimeout(() => {
@@ -135,7 +143,7 @@ export class RouteFormComponent {
   resetForm() {
     this.generatedRoute = null;
     this.currentStep = 1;
-    this.initForm();
+    this.routeForm.reset();
   }
 
   goBack() {

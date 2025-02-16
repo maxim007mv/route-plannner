@@ -1,0 +1,932 @@
+// Импорт шрифта Unbounded
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;500;600;700&display=swap');
+
+// Системные переменные и миксины
+$neo-shadow: 8px 8px 16px rgba(0, 0, 0, 0.2),
+            -8px -8px 16px rgba(255, 255, 255, 0.05);
+$primary-gradient: linear-gradient(135deg, #7C3AED, #C026D3);
+$accent-gradient: linear-gradient(135deg, #8B5CF6, #D946EF);
+$glass-bg: linear-gradient(135deg,
+            rgba(255, 255, 255, 0.08),
+            rgba(255, 255, 255, 0.03));
+
+// Миксины
+@mixin glass-effect {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.03)
+  );
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: $neo-shadow;
+}
+
+:root {
+  --primary-h: 265;
+  --primary-s: 89%;
+  --primary-l: 58%;
+  --text-primary: rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-tertiary: rgba(255, 255, 255, 0.5);
+  --spacing-unit: 0.5rem;
+  --border-radius: 16px;
+  --transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'Unbounded', sans-serif;
+}
+
+// Применяем шрифт ко всем элементам
+h1, h2, h3, h4, h5, h6,
+.route-nav-btn,
+.timeline-item h4,
+.cafe-card h4,
+.tip-card h4,
+p, span, button {
+  font-family: 'Unbounded', sans-serif;
+}
+
+// Настраиваем вес шрифта для разных элементов
+h1, h2 {
+  font-weight: 700;
+}
+
+h3, h4 {
+  font-weight: 600;
+}
+
+.route-nav-btn {
+  font-weight: 500;
+}
+
+p, span {
+  font-weight: 400;
+}
+
+.page-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #1a1a1a;
+  min-height: 100vh;
+}
+
+.header-section {
+  text-align: center;
+  margin-bottom: 4rem;
+  animation: float 4s ease-in-out infinite;
+
+  h1 {
+    font-size: 3.5rem;
+    background: $primary-gradient;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+    margin: 1.5rem 0;
+  }
+
+  .subtitle {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.2rem;
+    margin-top: 1rem;
+  }
+}
+
+.back-button {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1rem 1.5rem;
+  background: rgba(124, 58, 237, 0.1);
+  border: none;
+  border-radius: 50px;
+  color: #8B5CF6;
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: $neo-shadow;
+
+  &:hover {
+    transform: translateX(-5px);
+    background: rgba(124, 58, 237, 0.2);
+  }
+}
+
+.routes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 2.5rem;
+  padding: 1rem;
+}
+
+.route-card {
+  background: $glass-bg;
+  border-radius: 24px;
+  padding: 2.5rem;
+  backdrop-filter: blur(20px);
+  box-shadow: $neo-shadow;
+  transition: all 0.4s ease;
+  position: relative;
+  overflow: hidden;
+
+  &:hover {
+    transform: translateY(-10px);
+    box-shadow: 12px 12px 24px rgba(0, 0, 0, 0.3),
+                -12px -12px 24px rgba(255, 255, 255, 0.05);
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: $accent-gradient;
+  }
+
+  .title-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+
+    h2 {
+      font-size: 2rem;
+      background: $primary-gradient;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 0;
+      flex: 1;
+    }
+
+    .district-badge {
+      background: linear-gradient(135deg,
+        rgba(255,107,107,0.1),
+        rgba(255,142,83,0.1));
+      color: #ff8e53;
+      padding: 0.6rem 1.2rem;
+      border-radius: 50px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+  }
+
+  .route-tag {
+    background: rgba(124, 58, 237, 0.2);
+    i {
+      color: #8B5CF6;
+    }
+  }
+
+  .meta-info {
+    display: flex;
+    gap: 2rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.95rem;
+
+    span {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.5rem 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 50px;
+
+      i {
+        color: #8B5CF6;
+      }
+    }
+  }
+
+  .start-point {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+    padding: 2rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    box-shadow: inset $neo-shadow;
+
+    .icon-wrapper {
+      background: $primary-gradient;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      box-shadow: $neo-shadow;
+    }
+
+    .start-info {
+      .label {
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 0.5rem;
+      }
+
+      p {
+        color: #fff;
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 500;
+      }
+    }
+  }
+
+  .route-highlights {
+    margin-bottom: 2rem;
+
+    h3 {
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      font-size: 1.2rem;
+
+      i {
+        color: #4CAF50;
+      }
+    }
+
+    .points-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+
+      .point-item {
+        display: flex;
+        gap: 1rem;
+        align-items: flex-start;
+
+        .point-marker {
+          width: 12px;
+          height: 12px;
+          background: #4CAF50;
+          border-radius: 50%;
+          margin-top: 0.5rem;
+        }
+
+        p {
+          color: #ddd;
+          margin: 0;
+          flex: 1;
+        }
+      }
+    }
+  }
+
+  .food-section {
+    margin-bottom: 2rem;
+
+    .cafe-grid {
+      display: grid;
+      gap: 1rem;
+
+      .cafe-card {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 1.2rem;
+        border-radius: 12px;
+        transition: all 0.3s;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.1);
+        }
+
+        .cafe-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 0.8rem;
+
+          h4 {
+            color: #4CAF50;
+            margin: 0;
+          }
+
+          .price-range {
+            color: #888;
+            font-size: 0.9rem;
+          }
+        }
+
+        .cafe-address {
+          color: #888;
+          font-size: 0.9rem;
+          margin-bottom: 0.5rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .cafe-desc {
+          color: #ddd;
+          margin: 0;
+        }
+      }
+    }
+  }
+
+  .cost-summary {
+    margin-bottom: 2rem;
+
+    .cost-grid {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 12px;
+      padding: 1.5rem;
+
+      .cost-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        &.total {
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+          padding-top: 1rem;
+          margin-top: 1rem;
+
+          .cost-label {
+            color: #fff;
+            font-weight: 600;
+          }
+
+          .cost-value {
+            color: #8B5CF6;
+            font-weight: 600;
+          }
+        }
+
+        .cost-label {
+          color: #888;
+        }
+
+        .cost-value {
+          color: #8B5CF6;
+        }
+      }
+    }
+  }
+
+  .view-details-btn {
+    width: 100%;
+    padding: 1rem 2rem;
+    background: $primary-gradient;
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(124, 58, 237, 0.4);
+    }
+
+    i {
+      margin-left: 8px;
+    }
+  }
+
+  .icon-wrapper {
+    background: $primary-gradient;
+  }
+
+  .transport-badge {
+    background: rgba(124, 58, 237, 0.1);
+    color: #8B5CF6;
+  }
+
+  .special-note {
+    i {
+      color: #8B5CF6;
+    }
+  }
+
+  .cafe-tags .tag {
+    background: rgba(124, 58, 237, 0.1);
+    color: #8B5CF6;
+  }
+
+  .attraction-tag {
+    background: rgba(124, 58, 237, 0.1);
+    color: #8B5CF6;
+  }
+
+  .timeline-item {
+    .time-marker {
+      background: $primary-gradient;
+    }
+
+    &.highlight {
+      border-left: 3px solid #8B5CF6;
+    }
+  }
+
+  .tip-icon {
+    background: $primary-gradient;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@media (max-width: 768px) {
+  .page-container {
+    padding: 1rem;
+  }
+
+  .header-section h1 {
+    font-size: 2.5rem;
+  }
+
+  .routes-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .back-button {
+    position: static;
+    margin-bottom: 2rem;
+  }
+}
+
+.route-timeline {
+  margin: 2rem 0;
+
+  .section-title {
+    font-size: 1.5rem;
+    color: #fff;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+
+    i {
+      color: #8B5CF6;
+    }
+  }
+
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .timeline-item {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.05);
+      transform: translateX(10px);
+    }
+
+    .time-marker {
+      width: 40px;
+      height: 40px;
+      background: $primary-gradient;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: white;
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+    }
+
+    .location-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+
+      h4 {
+        font-size: 1.3rem;
+        color: #fff;
+        margin: 0;
+      }
+
+      .duration-badge {
+        background: rgba(124, 58, 237, 0.1);
+        color: #8B5CF6;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+    }
+
+    .attractions-list {
+      display: grid;
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+
+    .attraction {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.8rem;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 8px;
+
+      i {
+        color: #8B5CF6;
+        font-size: 1.1rem;
+      }
+
+      span {
+        color: #ddd;
+        font-size: 1rem;
+      }
+    }
+
+    .attraction-card {
+      display: grid;
+      grid-template-columns: 40px 1fr;
+      gap: 1rem;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+
+      i {
+        color: #8B5CF6;
+        font-size: 1.5rem;
+        place-self: center;
+      }
+
+      .attraction-info {
+        h5 {
+          color: #fff;
+          margin: 0 0 0.3rem 0;
+          font-size: 1.1rem;
+        }
+
+        p {
+          color: #888;
+          margin: 0;
+          font-size: 0.9rem;
+          line-height: 1.4;
+        }
+      }
+    }
+
+    .special-note {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: rgba(124, 58, 237, 0.1);
+      border-radius: 12px;
+      display: grid;
+      grid-template-columns: 30px 1fr;
+      gap: 1rem;
+
+      i {
+        color: #8B5CF6;
+        font-size: 1.2rem;
+        place-self: start;
+        margin-top: 0.2rem;
+      }
+
+      .note-content {
+        h5 {
+          color: #8B5CF6;
+          margin: 0 0 0.3rem 0;
+          font-size: 1rem;
+        }
+
+        p {
+          color: #ddd;
+          margin: 0;
+          font-size: 0.9rem;
+          line-height: 1.4;
+        }
+      }
+    }
+  }
+}
+
+.food-section, .tips-section {
+  margin-top: calc(var(--spacing-unit) * 8);
+
+  .section-title {
+    font-size: 1.5rem;
+    color: #fff;
+    margin-bottom: calc(var(--spacing-unit) * 4);
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+
+    i {
+      color: #8B5CF6;
+      font-size: 1.3rem;
+    }
+  }
+}
+
+.cafe-grid {
+  display: grid;
+  gap: calc(var(--spacing-unit) * 4);
+  margin-bottom: calc(var(--spacing-unit) * 8);
+
+  .cafe-card {
+    .cafe-content {
+      .cafe-header {
+        flex-wrap: wrap;
+        gap: 1rem;
+
+        h4 {
+          font-size: 1.3rem;
+          color: #fff;
+          margin: 0;
+          width: 100%;
+          margin-bottom: 0.5rem;
+        }
+
+        .cafe-description {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.8rem;
+          width: 100%;
+          margin-bottom: 0.8rem;
+
+          .tag {
+            background: rgba(124, 58, 237, 0.1);
+            color: #8B5CF6;
+            padding: 0.4rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+          }
+        }
+
+        .price-badge {
+          background: rgba(124, 58, 237, 0.1);
+          color: #8B5CF6;
+          padding: 0.5rem 1rem;
+          border-radius: 50px;
+          font-size: 0.9rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          white-space: nowrap;
+        }
+      }
+    }
+  }
+}
+
+.tips-grid {
+  display: grid;
+  gap: calc(var(--spacing-unit) * 6);
+
+  .tip-card {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin-bottom: calc(var(--spacing-unit) * 4);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.05);
+      transform: translateX(10px);
+    }
+
+    .tip-icon {
+      width: 40px;
+      height: 40px;
+      background: $primary-gradient;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+    }
+
+    .tip-content {
+      h4 {
+        font-size: 1.2rem;
+        color: #fff;
+        margin: 0 0 0.5rem 0;
+      }
+
+      p {
+        color: #ddd;
+        margin: 0;
+        font-size: 0.95rem;
+        line-height: 1.5;
+      }
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .cafe-card {
+    .cafe-content {
+      .cafe-header {
+        text-align: left;
+
+        .cafe-description {
+          justify-content: flex-start;
+        }
+
+        .price-badge {
+          margin-left: 0;
+        }
+      }
+    }
+  }
+
+  .tips-grid {
+    gap: calc(var(--spacing-unit) * 3);
+  }
+}
+
+.routes-navigation {
+  display: flex;
+  gap: calc(var(--spacing-unit) * 8);
+  margin: calc(var(--spacing-unit) * 12) 0;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: calc(var(--spacing-unit) * 6);
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 24px;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+
+  .route-nav-btn {
+    position: relative;
+    background: rgba(124, 58, 237, 0.05);
+    border: 1px solid rgba(124, 58, 237, 0.1);
+    padding: calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 5);
+    border-radius: 18px;
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: calc(var(--spacing-unit) * 2.5);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 280px;
+    justify-content: center;
+    letter-spacing: 0.02em;
+
+    i {
+      font-size: 1.3rem;
+      color: #8B5CF6;
+      transition: transform 0.3s ease;
+    }
+
+    &:hover {
+      background: rgba(124, 58, 237, 0.1);
+      border-color: rgba(124, 58, 237, 0.2);
+
+      i {
+        transform: scale(1.1);
+      }
+    }
+
+    &.active {
+      background: $primary-gradient;
+      color: white;
+      border: none;
+
+      i {
+        color: white;
+      }
+    }
+  }
+}
+
+.routes-container {
+  margin-top: calc(var(--spacing-unit) * 12);
+  padding: 0 calc(var(--spacing-unit) * 6);
+
+  .route-card {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: calc(var(--spacing-unit) * 6);
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+
+    transform: none;
+    transition: none;
+
+    .timeline-item {
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: translateX(10px);
+      }
+    }
+
+    .cafe-card, .tip-card {
+      transition: transform 0.3s ease, background-color 0.3s ease;
+
+      &:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.05);
+      }
+    }
+  }
+}
+
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+p, span {
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+}
+
+.section-title {
+  margin-bottom: calc(var(--spacing-unit) * 4);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.location-header h4 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+@media (max-width: 768px) {
+  .routes-navigation {
+    padding: calc(var(--spacing-unit) * 4);
+    gap: calc(var(--spacing-unit) * 4);
+    margin: calc(var(--spacing-unit) * 8) calc(var(--spacing-unit) * 3);
+
+    .route-nav-btn {
+      width: 100%;
+      min-width: auto;
+      padding: calc(var(--spacing-unit) * 2.5) calc(var(--spacing-unit) * 4);
+      font-size: 1rem;
+    }
+  }
+
+  .routes-container {
+    margin-top: calc(var(--spacing-unit) * 8);
+    padding: 0 calc(var(--spacing-unit) * 3);
+
+    .route-card {
+      padding: calc(var(--spacing-unit) * 4);
+    }
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  h2 {
+    font-size: 1.75rem;
+  }
+
+  .section-title {
+    font-size: 1.3rem;
+  }
+}
+
+@media (min-width: 1440px) {
+  .routes-container .route-card {
+    max-width: 1400px;
+  }
+}

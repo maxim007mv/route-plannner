@@ -1,0 +1,46 @@
+<div class="historical-routes">
+  <header class="route-header">
+    <h1>Исторические маршруты</h1>
+    <p class="subtitle">Путешествие во времени по улицам Москвы</p>
+  </header>
+
+  <div class="routes-container">
+    <div *ngFor="let route of historicalRoutes" class="route-card">
+      <div class="route-card-header">
+        <h2>{{ route.title }}</h2>
+        <div class="route-meta">
+          <span class="district">{{ route.district }}</span>
+          <span class="start-point">🚇 {{ route.startPoint }}</span>
+        </div>
+      </div>
+
+      <div class="key-points">
+        <h3>Ключевые точки маршрута:</h3>
+        <ul>
+          <li *ngFor="let point of route.keyPoints">{{ point }}</li>
+        </ul>
+      </div>
+
+      <div class="cafes">
+        <h3>Где перекусить:</h3>
+        <div class="cafe-cards">
+          <div *ngFor="let cafe of route.cafes" class="cafe-card">
+            <h4>{{ cafe.name }}</h4>
+            <p class="address">📍 {{ cafe.address }}</p>
+            <p class="description">{{ cafe.description }}</p>
+            <p class="price">💰 {{ cafe.price }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="costs">
+        <h3>Стоимость:</h3>
+        <ul>
+          <li>Вход в Кремль: {{ route.costs.entrance }}</li>
+          <li>Парк «Зарядье»: {{ route.costs.zaryadye }}</li>
+          <li class="total">Итого на человека: {{ route.costs.total }}</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

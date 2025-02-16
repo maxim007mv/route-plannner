@@ -1,18 +1,12 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterOutlet, RouterModule } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterModule],
+  imports: [RouterOutlet],
   template: `
-    <div class="container">
-      <router-outlet></router-outlet>
-    </div>
-  `,
-  styleUrls: ['./app.component.scss']
+    <router-outlet></router-outlet>
+  `
 })
-export class AppComponent {
-  title = 'route-planner';
-}
+export class AppComponent {}

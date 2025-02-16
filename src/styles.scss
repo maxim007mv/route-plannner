@@ -1,10 +1,37 @@
 /* You can add global styles to this file, and also import other style files */
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;500;600;700&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Unbounded', sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: linear-gradient(130deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+  font-family: 'Unbounded', sans-serif;
+  color: var(--text-primary);
+  overflow-x: hidden;
+}
 
 :root {
+  --primary-dark: #0A0A0B;
+  --secondary-dark: #121214;
+  --accent-color: #7C3AED;
+  --accent-hover: #8B5CF6;
+  --text-primary: #FFFFFF;
+  --text-secondary: #A1A1AA;
+  --card-bg: rgba(28, 28, 35, 0.5);
+  --card-border: rgba(124, 58, 237, 0.1);
+  --glass-effect: rgba(28, 28, 35, 0.3);
+
   // Modern Color Scheme
   --primary: #6366f1;
-  --primary-dark: #4f46e5;
   --secondary: #ec4899;
   --accent: #8b5cf6;
 
@@ -16,8 +43,6 @@
   // Neutral Colors
   --background: #0f172a;
   --surface: #1e293b;
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
 
   // Glass Effect
   --glass-background: rgba(255, 255, 255, 0.03);
@@ -35,21 +60,6 @@
   --radius-lg: 1.5rem;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  background: var(--background);
-  color: var(--text-primary);
-  min-height: 100vh;
-  line-height: 1.6;
-  background: radial-gradient(circle at top right, #2d1b69, #1a103f);
-}
-
 // Modern Scrollbar
 ::-webkit-scrollbar {
   width: 8px;
@@ -65,17 +75,33 @@ body {
 }
 
 // Utility Classes
-.glass-effect {
-  background: var(--glass-background);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
+.glass-morphism {
+  background: var(--glass-effect);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
-.gradient-text {
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.neon-border {
+  position: relative;
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(45deg, var(--accent-color), transparent);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+  }
+}
+
+.hover-effect {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  &:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 15px 30px rgba(124, 58, 237, 0.1);
+  }
 }
 
 // Animations
@@ -94,4 +120,24 @@ body {
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+.route-card {
+  background: rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+// Общие стили для всех карточек
+.card-common {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.2);
+  }
 }

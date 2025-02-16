@@ -1,36 +1,69 @@
-import { Component, Input, AfterViewInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, ElementRef, ViewChild, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { RouteData } from '../../models/route-data';
+import { Router } from '@angular/router';
+import { RouteService } from '../../services/route.service';
+
+// Объявляем тип для ymaps
+declare var ymaps: any;
 
 @Component({
   selector: 'app-route-result',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './route-result.component.html',
   styleUrls: ['./route-result.component.scss']
 })
 export class RouteResultComponent implements AfterViewInit, OnDestroy {
-  @Input() routeData!: RouteData;
+  @Input() routeData: RouteData | null = null;
   @ViewChild('mapContainer') mapContainer!: ElementRef;
 
   private map: ymaps.Map | null = null;
   private mapInitialized = false;
 
+  showImproveModal = false;
+  isImproving = false;
+  improvementData = {
+    remove: '',
+    add: ''
+  };
+
+  isLoading = false;
+
+  constructor(
+    private router: Router,
+    private routeService: RouteService
+  ) {
+    const currentRoute = this.routeService.getCurrentRoute();
+
+    if (!currentRoute && !this.isLoading) {
+      this.router.navigate(['/route-form']);
+      return;
+    }
+
+    this.routeData = currentRoute;
+  }
+
   ngAfterViewInit(): void {
-    this.initMap();
+    if (this.routeData && this.mapContainer) {
+      this.initMap();
+    }
   }
 
   ngOnDestroy(): void {
     if (this.map) {
       this.map.destroy();
+      this.map = null;
     }
+    this.mapInitialized = false;
   }
 
   private async initMap(): Promise<void> {
     if (this.mapInitialized) return;
 
     try {
-      // Проверяем, не инициализирована ли уже карта
       if (this.map) {
         this.map.destroy();
         this.map = null;
@@ -47,20 +80,18 @@ export class RouteResultComponent implements AfterViewInit, OnDestroy {
 
   private waitForYMaps(): Promise<void> {
     return new Promise((resolve) => {
-      // Если ymaps уже загружен
+      // Проверяем существование объекта ymaps и его готовность
       if (typeof ymaps !== 'undefined' && ymaps.ready) {
         ymaps.ready(resolve);
         return;
       }
 
-      // Если скрипт уже добавлен на страницу
       const existingScript = document.querySelector('script[src*="api-maps.yandex.ru"]');
       if (existingScript) {
         ymaps.ready(resolve);
         return;
       }
 
-      // Если скрипт еще не добавлен
       const script = document.createElement('script');
       script.src = 'https://api-maps.yandex.ru/2.1/?lang=ru_RU';
       script.async = true;
@@ -79,7 +110,7 @@ export class RouteResultComponent implements AfterViewInit, OnDestroy {
   }
 
   private displayRouteOnMap(): void {
-    if (!this.map || !this.routeData.coordinates.length) return;
+    if (!this.map || !this.routeData?.coordinates.length) return;
 
     this.map.geoObjects.removeAll();
 
@@ -107,17 +138,85 @@ export class RouteResultComponent implements AfterViewInit, OnDestroy {
 
   openInYandexMaps(stageIndex?: number): void {
     if (typeof stageIndex === 'number') {
-      // Открываем конкретный этап
-      const stage = this.routeData.stages[stageIndex];
-      const coordinates = this.routeData.coordinates[stageIndex];
+      const stage = this.routeData?.stages[stageIndex];
+      const coordinates = this.routeData?.coordinates[stageIndex];
       if (coordinates) {
         window.open(`https://yandex.ru/maps/?pt=${coordinates.lat},${coordinates.lng}&z=15`, '_blank');
       }
     } else {
-      // Открываем весь маршрут
-      if (this.routeData.mapUrl) {
+      if (this.routeData?.mapUrl) {
         window.open(this.routeData.mapUrl, '_blank');
       }
     }
+  }
+
+  createNewRoute() {
+    this.router.navigate(['/route-form']);
+  }
+
+  goHome() {
+    this.router.navigate(['/']);
+  }
+
+  getTotalDuration(): string {
+    return '~3 часа';
+  }
+
+  getEstimatedBudget(): string {
+    return '2000-3000 ₽';
+  }
+
+  getTransportInfo(): string {
+    return 'Пешком + метро';
+  }
+
+  getRouteTags(): string[] {
+    return ['Исторические места', 'Музеи', 'Парки', 'Кафе'];
+  }
+
+  getTagIcon(tag: string): string {
+    const icons: { [key: string]: string } = {
+      'Исторические места': 'fas fa-landmark',
+      'Музеи': 'fas fa-museum',
+      'Парки': 'fas fa-tree',
+      'Кафе': 'fas fa-coffee'
+    };
+    return icons[tag] || 'fas fa-tag';
+  }
+
+  openImproveModal() {
+    this.showImproveModal = true;
+  }
+
+  closeImproveModal() {
+    this.showImproveModal = false;
+    this.improvementData = { remove: '', add: '' };
+  }
+
+  async improveRoute() {
+    if (!this.improvementData.remove && !this.improvementData.add) return;
+
+    this.isImproving = true;
+    try {
+      const improvedRoute = await this.routeService.improveRoute(
+        this.routeData!,
+        this.improvementData
+      );
+      this.routeData = improvedRoute;
+      this.closeImproveModal();
+    } catch (error) {
+      console.error('Error improving route:', error);
+    } finally {
+      this.isImproving = false;
+    }
+  }
+
+  showLoading() {
+    this.isLoading = true;
+  }
+
+  setRouteData(data: RouteData) {
+    this.isLoading = false;
+    this.routeData = data;
   }
 }

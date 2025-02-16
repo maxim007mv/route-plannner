@@ -1,55 +1,75 @@
-<div class="result-container">
-  <div class="route-details">
-    <div *ngFor="let stage of routeData.stages; let i = index" class="stage-card">
-      <h3>Этап {{i + 1}}: {{stage.title}}</h3>
+<div class="route-result">
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Генерируем маршрут...</p>
+  </div>
 
-      <div *ngIf="stage.time" class="time">
-        ⌚ {{stage.time}}
-      </div>
+  <div *ngIf="routeData && !isLoading" class="content-container">
+    <div class="header-actions">
+      <button class="back-btn" (click)="goHome()">
+        <i class="fas fa-arrow-left"></i>
+        На главную
+      </button>
+    </div>
 
-      <div *ngIf="stage.description" class="route-section">
-        <h4>🗺️ Маршрут:</h4>
-        <ul>
-          <li>{{stage.description}}</li>
-        </ul>
-      </div>
+    <div class="stages">
+      <div *ngFor="let stage of routeData.stages; let i = index" class="stage">
+        <div class="stage-header">
+          <span class="stage-number">{{i + 1}}</span>
+          <h3>{{stage.title}}</h3>
+        </div>
 
-      <div *ngIf="stage.activities.length" class="attractions-section">
-        <h4>👀 Достопримечательности:</h4>
-        <div *ngFor="let activity of stage.activities" class="attraction-item">
-          {{activity}}
+        <div class="time-badge">
+          <i class="far fa-clock"></i>
+          {{stage.time}}
+        </div>
+
+        <div class="section route-section">
+          <h4><i class="fas fa-map-marked-alt"></i> Маршрут</h4>
+          <p>{{stage.description}}</p>
+        </div>
+
+        <div class="section transport-section">
+          <h4><i class="fas fa-subway"></i> Как добраться</h4>
+          <p>{{stage.transport}}</p>
+        </div>
+
+        <div *ngIf="stage.activities?.length" class="section attractions-section">
+          <h4><i class="fas fa-landmark"></i> Достопримечательности</h4>
+          <ul>
+            <li *ngFor="let activity of stage.activities">{{activity}}</li>
+          </ul>
+        </div>
+
+        <div *ngIf="stage.tips?.length" class="section tips-section">
+          <h4><i class="fas fa-lightbulb"></i> Советы</h4>
+          <ul>
+            <li *ngFor="let tip of stage.tips">{{tip}}</li>
+          </ul>
         </div>
       </div>
+    </div>
 
-      <div *ngIf="stage.activities.length" class="food-section">
-        <h4>🍴 Где поесть:</h4>
-        <div *ngFor="let activity of stage.activities" class="food-item">
-          {{activity}}
-        </div>
-      </div>
-
-      <div *ngIf="stage.tips.length" class="tips-section">
-        <h4>📌 Советы:</h4>
-        <ul>
-          <li *ngFor="let tip of stage.tips">{{tip}}</li>
-        </ul>
-      </div>
-
-      <div class="stage-map-actions">
-        <button class="yandex-maps-btn small" (click)="openInYandexMaps(i)">
-          <img src="assets/icons/yandex-maps.svg" alt="Yandex Maps Icon">
-          Показать на карте
+    <div class="route-actions">
+      <div class="buttons-container">
+        <button class="primary-btn yandex-route-btn" (click)="openInYandexMaps()">
+          <i class="fas fa-route"></i>
+          Открыть в Яндекс.Картах
+        </button>
+        <button class="secondary-btn new-route-btn" (click)="createNewRoute()">
+          <i class="fas fa-plus"></i>
+          Новый маршрут
         </button>
       </div>
     </div>
   </div>
 
-  <div id="map" class="map"></div>
-
-  <div class="map-actions">
-    <button class="yandex-maps-btn" (click)="openInYandexMaps()">
-      <img src="assets/icons/yandex-maps.svg" alt="Yandex Maps Icon">
-      Открыть весь маршрут в Яндекс.Картах
-    </button>
+  <div *ngIf="!routeData && !isLoading" class="error-container">
+    <div class="error-message">
+      <i class="fas fa-map-signs"></i>
+      <h3>Маршрут не найден</h3>
+      <p>Похоже, что-то пошло не так</p>
+      <button class="primary-btn" routerLink="/route-form">Создать новый маршрут</button>
+    </div>
   </div>
 </div>

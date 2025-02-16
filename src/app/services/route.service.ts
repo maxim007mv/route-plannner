@@ -9,6 +9,7 @@ import { catchError, firstValueFrom } from 'rxjs';
 })
 export class RouteService {
   private apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+  private currentRoute: RouteData | null = null;
 
   constructor(private http: HttpClient) {}
 
@@ -32,13 +33,13 @@ export class RouteService {
   async generateRoute(formData: any): Promise<RouteData> {
     try {
       const prompt = this.createRoutePrompt(formData);
+      console.log('Отправляем запрос с промптом:', prompt);
+
       const headers = new HttpHeaders()
         .set('Content-Type', 'application/json')
         .set('Cache-Control', 'no-cache');
 
       const params = { key: environment.geminiApiKey };
-
-      await new Promise(resolve => setTimeout(resolve, Math.random() * 1000));
 
       const response = await this.retryRequest(() =>
         firstValueFrom(
@@ -54,59 +55,87 @@ export class RouteService {
             }
           }, { headers, params }).pipe(
             catchError(error => {
-              if (error.status === 503) {
-                throw new Error('Сервис временно перегружен. Пожалуйста, подождите...');
-              }
+              console.error('Ошибка API:', error);
               throw error;
             })
           )
         )
       );
 
-      return this.parseRouteResponse(response);
+      console.log('Получен ответ от API:', response);
+      const parsedRoute = this.parseResponse(response);
+      console.log('Обработанный маршрут:', parsedRoute);
+      return parsedRoute;
     } catch (error: any) {
-      console.error('Error in generateRoute:', error);
-      throw new Error(error.message || 'Произошла непредвиденная ошибка');
+      console.error('Ошибка в generateRoute:', error);
+      throw error;
     }
   }
 
   private createRoutePrompt(formData: any): string {
-    return `Создай последовательный пешеходный маршрут прогулки по Москве, где точки маршрута логически связаны и находятся рядом друг с другом. Учитывай следующие параметры:
+    return `Создай очень подробный пешеходный маршрут по Москве. Маршрут должен быть последовательным и логичным, с детальным описанием каждого этапа.
+
+Параметры маршрута:
 Участники: ${formData.withWhom}
-Начало: ${formData.startTime}
+Время начала: ${formData.startTime}
 Длительность: ${formData.duration} часа
 Интересы: ${formData.interests.join(', ')}
 Бюджет на кафе: ${formData.cafeBudget}
-Способ передвижения: ${formData.transportPreference}
-Темп прогулки: ${formData.pace}
-${formData.accessibility ? 'Требуется доступная среда' : ''}
+Транспорт: ${formData.transportPreference}
+Темп: ${formData.pace}
+${formData.accessibility ? 'Нужна доступная среда' : ''}
 ${formData.avoidCrowds ? 'Избегать людных мест' : ''}
-Дополнительные пожелания: ${formData.additionalWishes}
+Пожелания: ${formData.additionalWishes}
 
-Важно: Строй маршрут так, чтобы места находились в пешей доступности друг от друга, и можно было комфортно успеть посетить все точки за указанное время.
-
-Формат вывода для каждого этапа:
-### Этап 1: [Название района или главной достопримечательности]
-⌚ Время: [XX:XX-XX:XX]
-🗺️ Маршрут:
-• Начните с [место], адрес: [адрес]
-• Пройдите [X] метров по [улица] до [следующая точка]
-• [Следующие шаги маршрута...]
-🚕 Транспорт: [как добраться до начальной точки]
+Для каждого этапа маршрута предоставь следующую информацию:
+### Этап 1: [Название локации или активности]
+⌚ Время: [Точное время начала и продолжительность]
+🗺️ Маршрут: [Максимально подробное описание маршрута с указанием улиц, поворотов, ориентиров]
+🚕 Транспорт: [Подробные инструкции как добраться]
 👀 Достопримечательности:
-- [Название]: [краткое описание и адрес]
+- [Название]: [2-3 предложения описания]
+- [Название]: [2-3 предложения описания]
 🍴 Где поесть:
-- [Название заведения]: [кухня], [ценовой диапазон], [адрес]
+- [Название заведения]: [кухня, средний чек, особенности]
+- [Название заведения]: [кухня, средний чек, особенности]
 📌 Советы:
-✓ [совет по маршруту]
-✓ [совет по времени посещения]
-📍 Координаты: [координаты начальной точки этапа]`;
+✓ [Совет по времени посещения]
+✓ [Совет по билетам/очередям]
+✓ [Другие полезные советы]
+📍 Координаты: [55.XXXXX, 37.XXXXX]
+
+Важно:
+1. Учитывай время суток и сезон
+2. Рассчитывай время на переходы
+3. Добавляй время на осмотр
+4. Учитывай перерывы на отдых
+5. Предлагай альтернативы
+6. Указывай места для фото
+7. Добавляй исторические факты`;
   }
 
-  private parseRouteResponse(response: any): RouteData {
-    const text = response?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!text) throw new Error('Invalid API response');
+  private parseResponse(response: any): RouteData {
+    try {
+      const text = response?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!text) {
+        throw new Error('Неверный формат ответа от API');
+      }
 
+      const stages = this.parseStages(text);
+      const coordinates = this.parseCoordinates(text);
+
+      return {
+        stages: stages,
+        coordinates: coordinates,
+        mapUrl: this.generateMapUrl(coordinates)
+      };
+    } catch (error) {
+      console.error('Ошибка при разборе ответа:', error);
+      throw error;
+    }
+  }
+
+  private parseStages(text: string): any[] {
     const stages = text.split('### Этап').filter(Boolean).map((stage: string) => {
       const timeMatch = stage.match(/⌚ Время: (.+)/);
       const titleMatch = stage.match(/\d+: (.+?)\n/);
@@ -137,34 +166,62 @@ ${formData.avoidCrowds ? 'Избегать людных мест' : ''}
         transport: transportMatch?.[1].trim() || '',
         activities,
         tips,
-        coordinates: this.parseCoordinates(coordsMatch?.[1] || '')
+        coordinates: [this.parseCoordinates(coordsMatch?.[1] || '')[0]]
       };
     });
 
-    return {
-      stages: stages.map(({ coordinates, ...rest }: { coordinates: { lat: number, lng: number }, [key: string]: any }) => rest),
-      coordinates: stages.map((stage: { coordinates: { lat: number, lng: number } }) => stage.coordinates),
-      mapUrl: this.generateYandexMapsUrl(stages.map((stage: { coordinates: { lat: number, lng: number } }) => stage.coordinates))
-    };
-  }
-
-  private parseCoordinates(coordString: string): { lat: number, lng: number } {
-    const [lat, lng] = coordString.split(',').map(Number);
-    if (isNaN(lat) || isNaN(lng)) {
-      return { lat: 55.751244, lng: 37.618423 }; // Координаты центра Москвы по умолчанию
+    interface StageWithCoords {
+      coordinates: Array<{ lat: number; lng: number }>;
+      title: string;
+      time: string;
+      description: string;
+      transport: string;
+      activities: string[];
+      tips: string[];
     }
-    return { lat, lng };
+
+    return stages.map(({ coordinates, ...rest }: StageWithCoords) => rest);
   }
 
-  private generateYandexMapsUrl(coordinates: Array<{lat: number, lng: number}>): string {
-    if (!coordinates.length) return '';
+  private parseCoordinates(text: string): Array<{lat: number, lng: number}> {
+    const coordsMatches = text.match(/📍 Координаты: ([0-9.,\s]+)/g) || [];
+    return coordsMatches.map(match => {
+      const [lat, lng] = match.split(':')[1].trim().split(',').map(Number);
+      return isNaN(lat) || isNaN(lng)
+        ? { lat: 55.751244, lng: 37.618423 }
+        : { lat, lng };
+    });
+  }
 
-    // Формируем строку с координатами для маршрута
+  private generateMapUrl(coordinates: any[]): string {
+    if (!coordinates.length) return '';
     const points = coordinates
       .map(coord => `${coord.lat},${coord.lng}`)
       .join('~');
-
-    // Добавляем параметры для пешеходного маршрута
     return `https://yandex.ru/maps/?rtext=${points}&rtt=pd&mode=routes&rtt=pd`;
+  }
+
+  setCurrentRoute(route: RouteData) {
+    this.currentRoute = route;
+  }
+
+  getCurrentRoute(): RouteData | null {
+    return this.currentRoute;
+  }
+
+  async improveRoute(currentRoute: RouteData, improvements: { remove: string; add: string }): Promise<RouteData> {
+    const prompt = `Улучши существующий маршрут с учетом пожеланий:
+    Убрать: ${improvements.remove}
+    Добавить: ${improvements.add}
+
+    Текущий маршрут:
+    ${currentRoute.stages.map((stage, i) => `
+      Этап ${i + 1}: ${stage.title}
+      Время: ${stage.time}
+      Описание: ${stage.description}
+    `).join('\n')}`;
+
+    // Используем тот же метод генерации, но с новым промптом
+    return this.generateRoute({ ...currentRoute, improvements: prompt });
   }
 }
