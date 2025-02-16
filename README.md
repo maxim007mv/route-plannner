@@ -177,15 +177,15 @@ npm clean-install
 npm install -g @angular/cli
 
 ### Структура проекта
-#├── src/
-#│ ├── app/
-#│ │ ├── components/
-#│ │ ├── services/
-#│ │ └── models/
-#│ ├── assets/
-#│ └── environments/
-#├── package.json
-#└── angular.json
+├── src/
+│ ├── app/
+│ │ ├── components/
+│ │ ├── services/
+│ │ └── models/
+│ ├── assets/
+│ └── environments/
+├── package.json
+└── angular.json
 
 ## 👥 Команда
 - **Разработчик**: [Максим](https://github.com/maxim007mv)
