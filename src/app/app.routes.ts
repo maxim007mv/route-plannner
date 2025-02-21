@@ -3,7 +3,6 @@ import { RouteFormComponent } from './components/route-form/route-form.component
 import { HomeComponent } from './components/home/home.component';
 import { HistoricalRoutesComponent } from './components/historical-routes/historical-routes.component';
 import { HistoricalCategoriesComponent } from './components/historical-categories/historical-categories.component';
-import { RouteResultComponent } from './components/route-result/route-result.component';
 
 export const routes: Routes = [
   {
@@ -33,10 +32,6 @@ export const routes: Routes = [
   {
     path: 'historical-routes',
     component: HistoricalRoutesComponent
-  },
-  {
-    path: 'route-result',
-    component: RouteResultComponent
   },
   {
     path: '**',

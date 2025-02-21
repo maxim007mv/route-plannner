@@ -229,7 +229,7 @@ export class EditProfileComponent implements OnInit {
       if (this.selectedFile) {
         formData.avatar = await this.convertFileToBase64(this.selectedFile);
       }
-      await this.authService.updateProfile(formData);
+      this.authService.updateUserData(formData);
       this.close.emit();
     } catch (error) {
       console.error('Error updating profile:', error);

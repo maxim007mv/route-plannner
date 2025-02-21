@@ -10,8 +10,55 @@ import { catchError, firstValueFrom } from 'rxjs';
 export class RouteService {
   private apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
   private currentRoute: RouteData | null = null;
+  private calculator: any;
+  private wasmReady = false;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    this.initWasm();
+  }
+
+  private async initWasm() {
+    try {
+      const wasmModule = await import('../../assets/wasm/route_calculator.js');
+      const instance = await wasmModule.createModule();
+      this.calculator = new instance.RouteCalculator();
+      this.wasmReady = true;
+      console.log('WASM модуль успешно инициализирован');
+    } catch (error) {
+      console.error('Ошибка инициализации WASM:', error);
+    }
+  }
+
+  // Метод для проверки готовности WASM
+  private async ensureWasmReady() {
+    if (!this.wasmReady) {
+      await this.initWasm();
+    }
+  }
+
+  // Метод для расчета времени маршрута
+  calculateRouteTime(coordinates: Array<{lat: number, lng: number}>): number {
+    if (!this.calculator) return 0;
+
+    try {
+      return this.calculator.estimateTime(coordinates);
+    } catch (error) {
+      console.error('Ошибка расчета времени:', error);
+      return 0;
+    }
+  }
+
+  // Метод для поиска ближайшей точки
+  findNearestPoint(target: {lat: number, lng: number}, points: Array<{lat: number, lng: number}>) {
+    if (!this.calculator) return null;
+
+    try {
+      return this.calculator.findNearestPoint(target, points);
+    } catch (error) {
+      console.error('Ошибка поиска ближайшей точки:', error);
+      return null;
+    }
+  }
 
   private async retryRequest(fn: () => Promise<any>, retries = 5, delay = 2000): Promise<any> {
     try {
@@ -31,6 +78,7 @@ export class RouteService {
   }
 
   async generateRoute(formData: any): Promise<RouteData> {
+    await this.ensureWasmReady();
     try {
       const prompt = this.createRoutePrompt(formData);
       console.log('Отправляем запрос с промптом:', prompt);
@@ -65,6 +113,19 @@ export class RouteService {
       console.log('Получен ответ от API:', response);
       const parsedRoute = this.parseResponse(response);
       console.log('Обработанный маршрут:', parsedRoute);
+
+      // Используем C++ для оптимизации маршрута
+      if (this.calculator && parsedRoute.coordinates.length > 0) {
+        const optimizedCoordinates = this.calculator.optimizeRoute(parsedRoute.coordinates);
+        const routeStats = this.calculator.calculateRouteStats(optimizedCoordinates);
+
+        return {
+          ...parsedRoute,
+          coordinates: optimizedCoordinates,
+          stats: routeStats
+        };
+      }
+
       return parsedRoute;
     } catch (error: any) {
       console.error('Ошибка в generateRoute:', error);
@@ -73,6 +134,64 @@ export class RouteService {
   }
 
   private createRoutePrompt(formData: any): string {
+    // Добавляем новый маршрут в базу знаний
+    const routeTemplates = {
+      art: [
+        // ... существующие маршруты ...
+        {
+          name: "Замоскворечье: купеческая Москва",
+          description: `Маршрут по историческому району Замоскворечье, знакомящий с купеческой архитектурой и культурой старой Москвы.
+
+          Основные точки маршрута:
+          1. Третьяковская галерея (Лаврушинский пер.)
+          - Осмотр шедевров русского искусства
+          - Иконы Андрея Рублева
+          - "Девочка с персиками" Серова
+
+          2. Храм Климента Папы Римского (Пятницкая ул.)
+          - Архитектура в стиле барокко XVIII века
+          - Уникальные фрески
+          - Исторический иконостас
+
+          3. Усадьба Демидовых (Б. Толмачевский пер.)
+          - Классицизм с элементами модерна
+          - История купеческой семьи
+
+          4. Пятницкая улица
+          - Особняк купца Куманина
+          - Усадьба Игумнова
+          - Историческая застройка
+
+          5. Овчинниковская набережная
+          - Панорама Москвы-реки
+          - Виды на сталинские высотки
+
+          Рекомендуемые места для отдыха:
+          - Трапезная ANTIПА (Колымажный пер.) - постное меню, 250-500₽
+          - Ресторан "Урюк" (Пятницкая ул.) - узбекская кухня, 600-1200₽
+          - Кофейня "Март" (Пятницкая ул.) - кофе и завтраки, 400-800₽
+
+          Время маршрута: 3-4 часа
+          Начало: метро "Третьяковская"
+          Транспорт: пешком + возможность использования трамвая №А`,
+          coordinates: [
+            { lat: 55.741389, lng: 37.618786 }, // Третьяковская галерея
+            { lat: 55.741667, lng: 37.629167 }, // Храм Климента
+            { lat: 55.738889, lng: 37.621389 }, // Усадьба Демидовых
+            { lat: 55.740278, lng: 37.627778 }, // Пятницкая улица
+            { lat: 55.737500, lng: 37.626389 }  // Овчинниковская набережная
+          ],
+          tags: ['искусство', 'история', 'архитектура', 'купечество', 'православие'],
+          duration: 240, // в минутах
+          distance: 3.5, // в километрах
+          difficulty: 'средняя',
+          season: 'любой',
+          time_of_day: ['утро', 'день', 'вечер']
+        }
+      ],
+      // ... остальные категории ...
+    };
+
     return `Создай очень подробный пешеходный маршрут по Москве. Маршрут должен быть последовательным и логичным, с детальным описанием каждого этапа.
 
 Параметры маршрута:

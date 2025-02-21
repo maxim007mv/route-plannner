@@ -1,25 +1,18 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
-import { HomeComponent } from './components/home/home.component';
-import { CreateRouteComponent } from './components/create-route/create-route.component';
-import { LoginComponent } from './components/login/login.component';
+import { RouterModule } from '@angular/router';
+import { HttpClientModule } from '@angular/common/http';
 import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    HomeComponent,
-    CreateRouteComponent,
-    LoginComponent
-  ],
   imports: [
     BrowserModule,
-    AppRoutingModule,
+    RouterModule,
+    HttpClientModule,
     ReactiveFormsModule
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  providers: [
+    { provide: 'YANDEX_MAPS_API_KEY', useValue: 'ВАШ_API_КЛЮЧ' }
+  ]
 })
 export class AppModule { }

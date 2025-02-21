@@ -1,65 +1,111 @@
-import { Injectable } from '@angular/core';
+import { Injectable, PLATFORM_ID, Inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject } from 'rxjs';
 import { User } from '../models/user';
+import { Route } from '../models/route';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { tap, map } from 'rxjs/operators';
+
+interface AuthResponse {
+  user: User;
+  token: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly STORAGE_KEY = 'user';
+  private apiUrl = 'http://localhost:3000/api'; // URL вашего бэкенда
   private currentUserSubject = new BehaviorSubject<User | null>(null);
-  currentUser$ = this.currentUserSubject.asObservable();
+  public currentUser$ = this.currentUserSubject.asObservable();
+  private tokenKey = 'auth_token';
+  private isBrowser: boolean;
 
-  constructor() {
-    this.loadUserFromStorage();
+  constructor(
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+    this.loadUserFromToken();
   }
 
-  private loadUserFromStorage() {
-    const userStr = localStorage.getItem(this.STORAGE_KEY);
-    if (userStr) {
-      const user = JSON.parse(userStr);
-      this.currentUserSubject.next(user);
+  private loadUserFromToken() {
+    if (this.isBrowser) {
+      const token = localStorage.getItem(this.tokenKey);
+      if (token) {
+        this.validateToken(token).subscribe({
+          next: (user) => this.currentUserSubject.next(user),
+          error: () => this.logout()
+        });
+      }
     }
   }
 
-  register(email: string, password: string) {
-    // В реальном приложении здесь был бы запрос к API
-    const newUser: User = {
-      id: Math.random().toString(36).substr(2, 9),
-      email,
-      createdAt: new Date(),
-      savedRoutes: []
-    };
-
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(newUser));
-    this.currentUserSubject.next(newUser);
-    return Promise.resolve(newUser);
+  register(userData: {
+    email: string;
+    password: string;
+    name: string;
+  }): Observable<User> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/register`, userData, {
+      withCredentials: false
+    }).pipe(
+      tap(response => {
+        localStorage.setItem(this.tokenKey, response.token);
+        this.currentUserSubject.next(response.user);
+      }),
+      map(response => response.user)
+    );
   }
 
-  login(email: string, password: string) {
-    // Проверяем, есть ли сохраненный пользователь
-    const userStr = localStorage.getItem(this.STORAGE_KEY);
-    if (userStr) {
-      // Если есть сохраненный пользователь, используем его
-      const user = JSON.parse(userStr);
-      this.currentUserSubject.next(user);
-      return Promise.resolve(user);
-    } else {
-      // Если нет сохраненного пользователя, создаем нового
-      const newUser: User = {
-        id: Math.random().toString(36).substr(2, 9),
-        email,
-        createdAt: new Date(),
-        savedRoutes: []
-      };
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(newUser));
-      this.currentUserSubject.next(newUser);
-      return Promise.resolve(newUser);
+  login(email: string, password: string): Observable<User> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, { email, password }, {
+      withCredentials: false
+    }).pipe(
+      tap(response => {
+        if (this.isBrowser) {
+          localStorage.setItem(this.tokenKey, response.token);
+        }
+        this.currentUserSubject.next(response.user);
+      }),
+      map(response => response.user)
+    );
+  }
+
+  updateProfile(userData: Partial<User>): Observable<User> {
+    return this.http.patch<User>(`${this.apiUrl}/users/profile`, userData, {
+      headers: new HttpHeaders(this.getAuthHeaders())
+    }).pipe(
+      tap(updatedUser => this.currentUserSubject.next(updatedUser))
+    );
+  }
+
+  saveRoute(route: Route): Observable<User> {
+    return this.http.post<User>(`${this.apiUrl}/users/routes`, route, {
+      headers: new HttpHeaders(this.getAuthHeaders())
+    }).pipe(
+      tap(updatedUser => this.currentUserSubject.next(updatedUser))
+    );
+  }
+
+  private getAuthHeaders(): { [key: string]: string } {
+    if (this.isBrowser) {
+      const token = localStorage.getItem(this.tokenKey);
+      return token ? { 'Authorization': `Bearer ${token}` } : {};
     }
+    return {};
   }
 
-  logout() {
-    localStorage.removeItem(this.STORAGE_KEY);
+  private validateToken(token: string): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/validate-token`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+  }
+
+  logout(): void {
+    if (this.isBrowser) {
+      localStorage.removeItem(this.tokenKey);
+    }
     this.currentUserSubject.next(null);
   }
 
@@ -67,19 +113,19 @@ export class AuthService {
     return this.currentUserSubject.value !== null;
   }
 
-  updateProfile(profileData: Partial<User>) {
-    const userStr = localStorage.getItem(this.STORAGE_KEY);
-    if (userStr) {
-      const user = JSON.parse(userStr);
-      const updatedUser = { ...user, ...profileData };
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(updatedUser));
-      this.currentUserSubject.next(updatedUser);
-      return Promise.resolve(updatedUser);
-    }
-    return Promise.reject(new Error('Пользователь не найден'));
-  }
-
   getCurrentUser(): User | null {
     return this.currentUserSubject.value;
+  }
+
+  // Метод для обновления данных пользователя
+  updateUserData(userData: Partial<User>): void {
+    const currentUser = this.getCurrentUser();
+    if (currentUser) {
+      const updatedUser = { ...currentUser, ...userData };
+      if (this.isBrowser) {
+        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+      }
+      this.currentUserSubject.next(updatedUser);
+    }
   }
 }

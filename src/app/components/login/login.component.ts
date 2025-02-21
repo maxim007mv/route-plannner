@@ -16,10 +16,10 @@ import { AuthService } from '../../services/auth.service';
           <div class="auth-toggle">
             <button
               [class.active]="isLoginMode"
-              (click)="isLoginMode = true">Вход</button>
+              (click)="toggleMode()">Вход</button>
             <button
               [class.active]="!isLoginMode"
-              (click)="isLoginMode = false">Регистрация</button>
+              (click)="toggleMode()">Регистрация</button>
           </div>
         </div>
 
@@ -43,6 +43,18 @@ import { AuthService } from '../../services/auth.service';
               [class.invalid]="isFieldInvalid('password')">
             <div class="error-message" *ngIf="isFieldInvalid('password')">
               Пароль должен быть не менее 6 символов
+            </div>
+          </div>
+
+          <div class="form-group">
+            <input
+              type="text"
+              formControlName="name"
+              placeholder="Имя"
+              [class.invalid]="isFieldInvalid('name')"
+              *ngIf="!isLoginMode">
+            <div class="error-message" *ngIf="isFieldInvalid('name')">
+              Введите корректное имя
             </div>
           </div>
 
@@ -112,7 +124,12 @@ import { AuthService } from '../../services/auth.service';
         border: 1px solid var(--glass-border);
         border-radius: var(--radius-md);
         background: transparent;
+        color: white;
         transition: all 0.3s ease;
+
+        &::placeholder {
+          color: rgba(255, 255, 255, 0.7);
+        }
 
         &.invalid {
           border-color: var(--danger);
@@ -169,48 +186,71 @@ import { AuthService } from '../../services/auth.service';
 export class LoginComponent {
   isLoginMode = true;
   isLoading = false;
+  errorMessage = '';
   authForm: FormGroup;
 
   constructor(
     private fb: FormBuilder,
-    private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {
     this.authForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      name: ['']
     });
   }
 
-  isFieldInvalid(fieldName: string): boolean {
-    const field = this.authForm.get(fieldName);
-    return field ? (field.invalid && field.touched) : false;
+  async onSubmit() {
+    if (this.authForm.valid) {
+      this.isLoading = true;
+      this.errorMessage = '';
+
+      try {
+        if (this.isLoginMode) {
+          await this.authService.login(
+            this.authForm.value.email,
+            this.authForm.value.password
+          ).toPromise();
+          console.log('Успешный вход');
+        } else {
+          await this.authService.register({
+            email: this.authForm.value.email,
+            password: this.authForm.value.password,
+            name: this.authForm.value.name || this.authForm.value.email.split('@')[0]
+          }).toPromise();
+          console.log('Успешная регистрация');
+        }
+        this.router.navigate(['/profile']);
+      } catch (error: any) {
+        console.error('Ошибка:', error);
+        this.errorMessage = error?.error?.message || 'Произошла ошибка при аутентификации';
+      } finally {
+        this.isLoading = false;
+      }
+    } else {
+      this.errorMessage = 'Пожалуйста, заполните все поля корректно';
+    }
   }
 
-  async onSubmit() {
-    if (this.authForm.invalid) return;
-
-    this.isLoading = true;
-    const { email, password } = this.authForm.value;
-
-    try {
-      console.log('Попытка', this.isLoginMode ? 'входа' : 'регистрации');
-      if (this.isLoginMode) {
-        await this.authService.login(email, password);
-      } else {
-        await this.authService.register(email, password);
-      }
-      console.log('Успешная аутентификация');
-      this.router.navigate(['/profile']);
-    } catch (error: any) {
-      console.error('Ошибка аутентификации:', error);
-      // Здесь можно добавить отображение ошибки пользователю
-    } finally {
-      this.isLoading = false;
+  toggleMode() {
+    this.isLoginMode = !this.isLoginMode;
+    this.errorMessage = '';
+    if (this.isLoginMode) {
+      this.authForm.get('name')?.clearValidators();
+    } else {
+      this.authForm.get('name')?.setValidators([Validators.required]);
     }
+    this.authForm.get('name')?.updateValueAndValidity();
+  }
+
+  isFieldInvalid(field: string): boolean {
+    const formControl = this.authForm.get(field);
+    return formControl ? formControl.invalid && formControl.touched : false;
   }
 
   goBack() {
     this.router.navigate(['/']);
   }
 }
+

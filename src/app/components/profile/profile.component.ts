@@ -364,7 +364,7 @@ export class ProfileComponent implements OnInit {
   saveCurrentRoute() {
     if (this.currentRoute) {
       const updatedRoutes = [...(this.user?.savedRoutes || []), this.currentRoute];
-      this.authService.updateProfile({ savedRoutes: updatedRoutes });
+      this.authService.updateUserData({ savedRoutes: updatedRoutes });
       this.currentRoute = null;
     }
   }
